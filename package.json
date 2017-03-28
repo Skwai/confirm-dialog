@@ -1,0 +1,26 @@
+{
+  "name": "confirm-dialog",
+  "version": "1.0.0",
+  "description": "An extensible better looking alternative to window.confirm",
+  "main": "dist/index.min.js",
+  "repository": "https://github.com/Skwai/confirm-dialog.git",
+  "author": "Cameron Jensen",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c build/config.js",
+    "test": "mocha && eslint src/main.js"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.1",
+    "babel-plugin-transform-async-to-generator": "^6.22.0",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb-base": "^11.1.2",
+    "eslint-plugin-import": "^2.2.0",
+    "mocha": "^3.2.0",
+    "rollup": "^0.41.6",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-uglify": "^1.0.1"
+  },
+  "dependencies": {}
+}

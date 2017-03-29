@@ -1,12 +1,13 @@
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
 const { name, version, author, license } = require('../package.json');
 
 const banner = 
 `/*!
-  * ${name} 
-  * @version v${version} 
+  * ${name}
+  * @version v${version}
   * @author ${author}
   * @license ${license}
   */`;
@@ -15,7 +16,9 @@ export default {
   intro: '/* swag */',
   moduleName: 'plow',
   entry: 'src/index.js',
+  sourceMap: true,
   plugins: [
+    sourcemaps(),
     babel(),
     uglify({
       output: {

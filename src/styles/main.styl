@@ -1,0 +1,79 @@
+:root
+  --confirm-margin: 1rem
+  --confirm-padding: 1.5rem
+
+@keyframes confirm-scale
+  0%
+    opacity: 0
+    transform: scale(0.5) translateY(-1rem)
+  50%
+    opacity: 1
+  100%
+    opacity: 1
+    transform: scale(1) translateY(0)
+
+@keyframes confirm-overlay
+  0%
+    background: rgba(0,0,0,0)
+  100%
+    background: rgba(0,0,0,.2)
+
+.ConfirmDialog
+  font: 400 14px/1.5 Roboto, "Helvetica Neue", sans-serif;
+  position: fixed
+  top: 0
+  left: 0
+  width: 100vw
+  min-height: 100vh
+  display: flex
+  justify-content: center
+  align-items: center
+  color: rgba(0,0,0,.9)
+  -webkit-font-smoothing: antialiased;
+  animation: confirm-overlay 1s ease 1 forwards
+
+  &__Content
+    background: #fff
+    border-radius: 4px
+    max-width: 90vw
+    width: 420px
+    box-sizing: border-box
+    box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+    animation: 0.4s confirm-scale 1 forwards
+    opacity: 0
+
+  &__Title
+    margin: 0
+    font-size: 1.25rem
+    font-weight: 500
+
+  &__Header
+    padding: var(--confirm-padding) var(--confirm-padding) 0
+    
+  &__Message
+    padding: var(--confirm-margin) var(--confirm-padding) 0
+    color: rgba(0,0,0,.7)
+  
+  &__Actions
+    padding: var(--confirm-margin) var(--confirm-padding) var(--confirm-margin)
+    display: flex
+    justify-content: center
+
+  &__Confirm,
+  &__Cancel
+    border-radius: 4px
+    padding: 0.75rem 1rem
+    border: 0
+    font: inherit
+    margin: 0 0.5rem
+    text-transform: uppercase
+    font-weight: 500
+    letter-spacing: 0.04em
+    background: transparent
+    transition: background 0.2s
+    cursor: pointer
+
+    &:hover,
+    &:focus
+      background: rgba(0,0,0,.05)
+

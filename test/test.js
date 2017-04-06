@@ -51,6 +51,14 @@ describe('ConfirmDialog', function() {
     });
   });
 
+  it('fires cancel callback on root element click', function() {
+    return new Promise((resolve, reject) => {
+      const onCancel = resolve;
+      const confirm = new ConfirmDialog({ onCancel });
+      confirm.element.click();
+    });
+  });
+
   it('does not fire cancel callback on root element child click', function() {
     return new Promise((resolve, reject) => {
       const onCancel = reject;

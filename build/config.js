@@ -13,8 +13,7 @@ const banner =
   */`;
 
 export default {
-  intro: '/* swag */',
-  moduleName: 'plow',
+  moduleName: 'ConfirmDialog',
   entry: 'src/index.js',
   sourceMap: true,
   plugins: [
@@ -30,7 +29,7 @@ export default {
       }
     })
   ],
-  format: 'cjs',
+  format: 'umd',
   dest: 'dist/index.min.js',
   banner
 };

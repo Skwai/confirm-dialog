@@ -1,3 +1,5 @@
+import "object.assign";
+
 const DEFAULTS = {
   cancelLabel: 'Cancel',
   canCancel: true,
@@ -16,7 +18,7 @@ export default class ConfirmDialog {
   constructor(args) {
     this.opts = Object.assign({}, DEFAULTS, args);
     if (!(this.opts.parent instanceof Node)) {
-      throw Error('`parent` is not a valid `Node`');
+      throw Error('`parent` is not a valid `HTMLElement`');
     }
     Object.assign(this, {
       handleConfirm: this.handleConfirm.bind(this),
@@ -33,12 +35,14 @@ export default class ConfirmDialog {
     this.element = document.createElement('div');
     this.element.classList.add(this.opts.className);
     this.element.innerHTML = this.template(this.opts);
+    this.confirmButton = this.getConfirmButton();
+    this.cancelButton = this.getCancelButton();
     document.body.appendChild(this.element);
     this.bindListeners();
   }
 
   destroy() {
-    this.unbindListeners();
+    this.unbindListeners();    
     if (this.element instanceof Node) {
       this.element.parentNode.removeChild(this.element);
       delete this.element;
@@ -51,16 +55,23 @@ export default class ConfirmDialog {
     }
   }
 
+  getConfirmButton() {
+    this.confirmButton = this.confirmButton || this.element.querySelector(`.${this.opts.className}__Confirm`);
+    return this.confirmButton;
+  }
+
+  getCancelButton() {
+    this.cancelButton = this.cancelButton || this.element.querySelector(`.${this.opts.className}__Cancel`);
+    return this.cancelButton;
+  }
+
   bindListeners() {
-    const { element: el } = this;
-    const { canCancel } = this.opts;
-    if (canCancel) {
-      el.addEventListener('click', (ev) => {
-        if (ev.target.isSameNode(el)) {
-          this.handleCancel();
-        }
-      });
+    const { element: el, cancelButton, confirmButton } = this;
+    this.getConfirmButton().addEventListener('click', this.handleConfirm);
+    if (this.opts.canCancel) {
+      el.addEventListener('click', (ev) => ev.target.isSameNode(el) ? this.handleCancel() : ev);
       window.addEventListener('keyup', this.handleEscape);
+      this.getCancelButton().addEventListener('click', this.handleCancel);
     }
   }
 
@@ -69,12 +80,12 @@ export default class ConfirmDialog {
   }
 
   async handleCancel(ev) {
-    await this.onCancel(ev);
+    await this.opts.onCancel(ev);
     this.destroy();
   }
 
   async handleConfirm(ev) {
-    await this.onConfirm(ev);
+    await this.opts.onConfirm(ev);
     this.destroy();
   }
 

@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "An extensible better looking alternative to window.confirm",
   "main": "dist/index.min.js",
+  "module": "./index.js",
   "repository": "https://github.com/Skwai/confirm-dialog.git",
   "author": "Cameron Jensen",
   "license": "MIT",
   "scripts": {
     "build": "rollup -c build/config.js && npm run styles",
     "styles": "stylus -c < src/styles/main.styl > dist/style.css",
-    "test": "mocha && eslint src/main.js"
+    "test": "karma start karma.conf.js && eslint src/main.js"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.1",
@@ -17,15 +18,20 @@
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-preset-es2015-rollup": "^3.0.0",
+    "chai": "^3.5.0",
     "eslint": "^3.18.0",
     "eslint-config-airbnb-base": "^11.1.2",
     "eslint-plugin-import": "^2.2.0",
+    "karma": "^1.6.0",
+    "karma-chai": "^0.1.0",
+    "karma-es6-shim": "^1.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-phantomjs-launcher": "^1.0.4",
     "mocha": "^3.2.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-sourcemaps": "^0.4.1",
     "rollup-plugin-uglify": "^1.0.1",
     "stylus": "^0.54.5"
-  },
-  "dependencies": {}
+  }
 }

@@ -10,7 +10,14 @@
   <script src="../dist/index.min.js"></script>
   <script>
   new ConfirmDialog({
-    message: 'This is an example message. You can have any message that you like here.'
+    title: 'This is a title',
+    message: 'This is an example message. You can have any message that you like here.',
+    onConfirm() {
+      alert('Confirm');
+    },
+    onCancel() {
+      alert('Cancel');
+    }
   });
   </script>
 </body>

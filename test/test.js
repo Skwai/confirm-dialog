@@ -7,6 +7,13 @@ describe('ConfirmDialog', function() {
     assert.ok(confirm.element.parentNode.isSameNode(confirm.element.parentNode));
   });
 
+  it('renders element to supplied parent argument', function() {
+    const parent = document.createElement('div');
+    document.body.appendChild(parent);
+    const confirm = new ConfirmDialog({ parent });
+    assert.ok(confirm.element.parentNode.isSameNode(parent));
+  });
+
   it('renders title', function() {
     const title = "Example Title";
     const confirm = new ConfirmDialog({ title });
@@ -50,6 +57,33 @@ describe('ConfirmDialog', function() {
       confirm.cancelButton.click();
     });
   });
+
+  it('cannot cancel if `canCancel` is `false`', function() {
+    const confirm = new ConfirmDialog({ canCancel: false });
+    confirm.cancel();
+    assert.ok(confirm.element instanceof Node);
+    assert.equal(confirm.cancelled, false);
+    assert.equal(confirm.cancelButton, undefined);
+  });
+
+  it('destroys DOM when cancelled', function(done) {
+    const confirm = new ConfirmDialog();
+    confirm.cancel().then(() => {
+      assert.isNotOk(confirm.element);
+      assert.ok(confirm.destroyed);
+      assert.ok(confirm.cancelled);
+      done();
+    });
+  });
+
+  it('awaits promise before cancelling', function(done) {
+    const onCancel = () => new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    }).then(done);
+    const confirm = new ConfirmDialog({ onCancel });
+    const cancel = confirm.cancel();
+    assert.ok(cancel instanceof Promise);
+  })
 
   it('fires cancel callback on root element click', function() {
     return new Promise((resolve, reject) => {

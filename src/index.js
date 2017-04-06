@@ -1,5 +1,3 @@
-import "object.assign";
-
 const DEFAULTS = {
   cancelLabel: 'Cancel',
   canCancel: true,
@@ -17,6 +15,9 @@ const ESCAPE_KEYCODE = 27;
 export default class ConfirmDialog {
   constructor(args) {
     this.opts = Object.assign({}, DEFAULTS, args);
+    this.cancelled = false;
+    this.destroyed = false;
+    this.loading = false;
     if (!(this.opts.parent instanceof Node)) {
       throw Error('`parent` is not a valid `HTMLElement`');
     }
@@ -30,23 +31,25 @@ export default class ConfirmDialog {
 
   render() {
     if (this.element) {
-      throw Error('Cannot render, `element` already exists');
-    }    
+      throw Error('Cannot render, `this.element` already exists');
+    }
     this.element = document.createElement('div');
     this.element.classList.add(this.opts.className);
     this.element.innerHTML = this.template(this.opts);
     this.confirmButton = this.getConfirmButton();
     this.cancelButton = this.getCancelButton();
-    document.body.appendChild(this.element);
+    this.opts.parent.appendChild(this.element);
     this.bindListeners();
   }
 
   destroy() {
-    this.unbindListeners();    
-    if (this.element instanceof Node) {
+    this.unbindListeners();
+    if (this.element instanceof Node && !this.destroyed) {
       this.element.parentNode.removeChild(this.element);
       delete this.element;
+      this.destroyed = true;
     }
+    return this.destroyed;
   }
 
   handleEscape(ev) {
@@ -79,14 +82,34 @@ export default class ConfirmDialog {
     window.removeEventListener('keyup', this.handleEscape);
   }
 
+  confirm() {
+    return this.handleConfirm();
+  }
+
+  cancel() {
+    return this.handleCancel();
+  }
+
   async handleCancel(ev) {
+    if (!this.opts.canCancel || this.loading) {
+      return;
+    }
+    this.loading = true;
     await this.opts.onCancel(ev);
+    this.loading = false;
     this.destroy();
+    return true;
   }
 
   async handleConfirm(ev) {
+    if (this.loading) {
+      return false;
+    }
+    this.loading = true;
     await this.opts.onConfirm(ev);
+    this.loading = false;
     this.destroy();
+    return true;
   }
 
   template({

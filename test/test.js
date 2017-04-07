@@ -1,13 +1,13 @@
 const CLASS_NAME = "ConfirmDialog";
 
 describe('ConfirmDialog', function() {
-  it('creates elements', function () {
+  it('renders to document.body by default', function () {
     const confirm = new ConfirmDialog();
     assert.ok(confirm.element instanceof Node);
     assert.ok(confirm.element.parentNode.isSameNode(confirm.element.parentNode));
   });
 
-  it('renders element to supplied parent argument', function() {
+  it('renders element to supplied parent', function() {
     const parent = document.createElement('div');
     document.body.appendChild(parent);
     const confirm = new ConfirmDialog({ parent });
@@ -66,13 +66,35 @@ describe('ConfirmDialog', function() {
     assert.equal(confirm.cancelButton, undefined);
   });
 
-  it('destroys DOM when cancelled', function(done) {
-    const confirm = new ConfirmDialog();
-    confirm.cancel().then(() => {
-      assert.isNotOk(confirm.element);
-      assert.ok(confirm.destroyed);
-      assert.ok(confirm.cancelled);
-      done();
+  it('destroys DOM when cancelled', function() {
+    return new Promise((resolve, reject) => {
+      const confirm = new ConfirmDialog();
+      confirm.cancel().then(() => {
+        assert.ok(confirm.cancelled, 'sets cancelled to true when cancelled');
+        assert.ok(confirm.destroyed, 'sets destroyed to true when destroyed');
+        assert.notOk(confirm.element, 'destroys dom element');
+        resolve();
+      });
+    });
+  });
+
+  it('does not cancel if onCancel is rejected', function() {
+    return new Promise((resolve, reject) => {
+      const onCancel = () => Promise.reject();
+      const confirm = new ConfirmDialog({ onCancel });
+      confirm.cancel()
+        .then(() => reject('should not return resolved promise'))
+        .catch(() => confirm.cancelled === false ? resolve() : reject('cancelled should be false'))
+    });
+  });
+
+  it('does not confirm if onConfirm is rejected', function() {
+    return new Promise((resolve, reject) => {
+      const onConfirm = () => Promise.reject();
+      const confirm = new ConfirmDialog({ onConfirm });
+      confirm.confirm()
+        .then(() => reject('should not return resolved promise'))
+        .catch(() => confirm.confirmed === false ? resolve() : reject('confirmed should be false'))
     });
   });
 

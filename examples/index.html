@@ -13,10 +13,10 @@
     title: 'This is a title',
     message: 'This is an example message. You can have any message that you like here.',
     onConfirm() {
-      alert('Confirm');
+      return Promise.resolve();
     },
     onCancel() {
-      alert('Cancel');
+      return Promise.resolve();
     }
   });
   </script>

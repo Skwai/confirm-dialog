@@ -15,24 +15,27 @@ const ESCAPE_KEYCODE = 27;
 export default class ConfirmDialog {
   constructor(args) {
     this.opts = Object.assign({}, DEFAULTS, args);
-    this.cancelled = false;
-    this.destroyed = false;
-    this.loading = false;
+
     if (!(this.opts.parent instanceof Node)) {
       throw Error('`parent` is not a valid `HTMLElement`');
     }
+
     Object.assign(this, {
+      destroyed: false,
+      loading: false,
+      cancelled: false,
+      confirmed: false,
       handleConfirm: this.handleConfirm.bind(this),
       handleCancel: this.handleCancel.bind(this),
       handleEscape: this.handleEscape.bind(this),
     });
+
     this.render();
   }
 
   render() {
-    if (this.element) {
-      throw Error('Cannot render, `this.element` already exists');
-    }
+    if (this.element) throw Error('Cannot render, `this.element` already exists');
+
     this.element = document.createElement('div');
     this.element.classList.add(this.opts.className);
     this.element.innerHTML = this.template(this.opts);
@@ -43,19 +46,21 @@ export default class ConfirmDialog {
   }
 
   destroy() {
+    if (this.destroyed) return false;
+
     this.unbindListeners();
-    if (this.element instanceof Node && !this.destroyed) {
+
+    if (this.element instanceof Node) {
       this.element.parentNode.removeChild(this.element);
       delete this.element;
       this.destroyed = true;
     }
+
     return this.destroyed;
   }
 
   handleEscape(ev) {
-    if (ev.keyCode === ESCAPE_KEYCODE) {
-      this.handleCancel(ev);
-    }
+    if (ev.keyCode === ESCAPE_KEYCODE) this.handleCancel(ev);
   }
 
   getConfirmButton() {
@@ -91,25 +96,35 @@ export default class ConfirmDialog {
   }
 
   async handleCancel(ev) {
-    if (!this.opts.canCancel || this.loading) {
-      return;
-    }
+    if (!this.opts.canCancel || this.loading) return Promise.reject();
+
+    let result;
     this.loading = true;
-    await this.opts.onCancel(ev);
+    try {
+      result = await this.opts.onCancel(ev);
+      this.cancelled = true;
+      this.destroy();
+    } catch (err) {
+      result = Promise.reject(err);
+    }
     this.loading = false;
-    this.destroy();
-    return true;
+    return result;
   }
 
   async handleConfirm(ev) {
-    if (this.loading) {
-      return false;
-    }
+    if (this.loading) return Promise.reject();
+
+    let result;
     this.loading = true;
-    await this.opts.onConfirm(ev);
+    try {
+      result = await this.opts.onConfirm(ev);
+      this.confirmed = true;
+      this.destroy();
+    } catch (err) {
+      result = Promise.reject(err);
+    }
     this.loading = false;
-    this.destroy();
-    return true;
+    return result;
   }
 
   template({
